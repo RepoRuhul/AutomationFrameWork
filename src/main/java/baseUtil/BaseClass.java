@@ -1,47 +1,75 @@
 package baseUtil;
 
 import java.time.Duration;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-
+import io.github.bonigarcia.wdm.WebDriverManager;
 import pages.HomePage;
-
-public class BaseClass {// Why default type is not ok for below 2 line?
-	// because different package accessibility is not possible for default type
+import utils.Configuration;
+import static utils.IConstant.*;
+public class BaseClass {
 	public WebDriver driver; // or we can use protected type
 	public HomePage homePage; // or we can use protected type
-
-	// Before start a test what need to do?
+	Configuration configuration;
 	@BeforeMethod
 	public void setUP() {
-		// First job is to recognize the location of driver from your device
-		// right click on chromedriver.exe --- properties -- copy the location an paste
-		// below
-		// System is a class and setProperty is a method of System Class
-		// 1st way, to show the location of chrome driver
-		// This is an absolute path
-		System.setProperty("webdriver.chrome.driver",
-				"C:\\Users\\ruhul\\eclipse-workspace\\com.bankofamerica\\driver\\chromedriver.exe");
-		// We instantiated the driver here
+		configuration=new Configuration();//default constructor of configuration class will be initialized
+		initDriver();
+		System.setProperty("webdriver.chrome.driver", "./driver/chromedriver.exe");
 		driver = new ChromeDriver();
-		// maximize method is used to maximize the window
+		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/driver/chromedriver.exe");
+		driver = new ChromeDriver();
 		driver.manage().window().maximize();
-		// deleteAllCookies do delete the cookies
 		driver.manage().deleteAllCookies();
-		// get method is used to get the targeted url
-		driver.get("https://www.bankofamerica.com/");
-		// PageLoadTimeout is used to wait to load the page for curtain amount of time
-		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
-		// Implicitly wait is used to wait for each web element
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
-		homePage = new HomePage(driver);// can you explain this line for me please?
+		driver.get(configuration.getProerties(URL));
+//		how can we convert a string to long type?
+		long pageLoadWait = Long.parseLong(configuration.getProerties(PAGELOAD_WAIT));
+		long implicitlyWait = Long.parseLong(configuration.getProerties(IMPLICITLY_WAIT));
+		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(pageLoadWait));
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitlyWait));
+		initClass();
+	}
+	public void initDriver() {
+	String browserName =	configuration.getProerties(BROWSER);
+		
+		switch (browserName) {
+		case "CHROME":
+			System.setProperty("webdriver.chrome.driver", "./driver/chromedriver.exe");
+			driver = new ChromeDriver();
+			
+			break;
+			
+		case "FIREFOX":
+			
+			 System.setProperty("webdriver.gecko.driver", "./driver/geckodriver.exe"); 
+			 driver = new FirefoxDriver();
+			 
+			 break;
+			 
+		case "EDGE":
+
+			System.setProperty("webdriver.edge.driver", "./driver/msedgedriver.exe"); 
+			driver = new EdgeDriver();
+			break;
+
+		default:
+			 WebDriverManager.chromedriver().setup(); 
+			 driver= new ChromeDriver();
+			break;
+
+		}
 	}
 
+	public void initClass() {
+		homePage = new HomePage(driver);
+		
+	}
 	@AfterMethod
-	public void tearUp() {// tearUp method na diye onno method diley problem hoto kina?
+	public void tearUp() {
 		driver.quit();
 	}
 
