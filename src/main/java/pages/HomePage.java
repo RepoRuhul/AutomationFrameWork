@@ -19,20 +19,28 @@ public class HomePage {
 	}
 
 	@FindBy(xpath = "//input[@name='onlineId1']")
-	WebElement userIdElement;
+	WebElement userId;
 	@FindBy(xpath = "//input[@id='passcode1']")
 	WebElement passWordElement;
 
-  public void insertText() {
-	  inputText(userIdElement, "dfskgd hs");
-	  inputText(passWordElement, "jkfdgdskkl");
-	  
-  }
+	public void inputTextInUserIdField() {
+		userId.sendKeys("rumaisa"); // value always inside " ", even if you use int type
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-	public void searchFieldElement() {
+	public void insertText() {
+		inputText(userId, "rumaisaraha");
+		inputText(passWordElement, "Rafdarafa12345");
+
+	}
+
+	public void searchFieldElement() throws InterruptedException {
 		WebElement passWordElement;
-
-		
+		Thread.sleep(5000);
 
 	}
 
